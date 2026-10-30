@@ -1,28 +1,61 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'add', text: string): void }>()
-const text = ref('')
+import { ref } from 'vue'
 
-const submit = () => {
-  if (!text.value.trim()) return
-  emit('add', text.value)
-  text.value = ''
+const title = ref('')
+const description = ref('')
+
+const emit = defineEmits<{
+  add: [task: { title: string; description: string }]
+}>()
+
+function addTask() {
+  if (!title.value.trim()) return
+
+  emit('add', {
+    title: title.value.trim(),
+    description: description.value.trim(),
+  })
+
+  title.value = ''
+  description.value = ''
 }
 </script>
 
 <template>
-  <div class="flex items-center rounded-lg bg-neutral-100 px-4 py-3 shadow-sm">
-    <input
-      v-model="text"
-      type="text"
-      placeholder="New Task"
-      aria-label="New task"
-      class="w-full bg-transparent text-neutral-700 placeholder-neutral-500 outline-none"
-      @keyup.enter="submit"
-    />
-    <button type="button" aria-label="Add task" class="ml-3 text-brand hover:text-brand-dark" @click="submit">
-      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
+  <form
+    class="grid grid-cols-1 gap-4 border-b border-[#E8D6C5]
+      pb-6 md:grid-cols-[1fr_1fr_auto] md:items-end"
+    @submit.prevent="addTask"
+  >
+    <div class="space-y-2">
+      <label class="text-sm font-semibold text-[#574337]">
+        Title:
+      </label>
+
+      <input
+        v-model="title"
+        class="input-field"
+        placeholder="What's the title of your To Do?"
+        maxlength="120"
+        required
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="text-sm font-semibold text-[#574337]">
+        Description:
+      </label>
+
+      <input
+        v-model="description"
+        class="input-field"
+        placeholder="What's the description of your To Do?"
+        maxlength="500"
+      />
+    </div>
+
+    <button type="submit" class="btn-primary">
+      + Add
     </button>
-  </div>
+  </form>
 </template>

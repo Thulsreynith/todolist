@@ -1,29 +1,102 @@
-<script setup lang="ts">
-import type { Todo } from '~/composables/useTodos'
 
-defineProps<{ todo: Todo }>()
-defineEmits<{
-  (e: 'toggle', id: number): void
-  (e: 'remove', id: number): void
+<script setup lang="ts">
+defineProps<{
+  task: {
+    id: number
+    title: string
+    description: string
+    completed: boolean
+  }
+}>()
+
+const emit = defineEmits<{
+  toggle: [id: number]
+  remove: [id: number]
 }>()
 </script>
 
 <template>
-  <li class="flex items-center justify-between py-2.5">
-    <label class="flex cursor-pointer items-center gap-3">
-      <input type="checkbox" class="peer sr-only" :checked="todo.done" @change="$emit('toggle', todo.id)" />
-      <span class="flex h-5 w-5 items-center justify-center rounded-full border border-neutral-500 peer-checked:border-brand peer-checked:bg-brand">
-        <svg v-if="todo.done" viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12l5 5L19 7" />
-        </svg>
-      </span>
-      <span :class="todo.done ? 'text-neutral-500 line-through' : 'text-neutral-700'">{{ todo.text }}</span>
-    </label>
+  <article
+    class="flex items-center justify-between gap-3 rounded-2xl
+      border border-[#E8D6C5] bg-[#FFF9F3] p-4
+      shadow-sm transition hover:shadow-md sm:p-5"
+  >
+    <div class="min-w-0 flex-1">
+      <h3
+        class="break-words text-lg font-bold text-[#A6532D]"
+        :class="{ 'line-through opacity-50': task.completed }"
+      >
+        {{ task.title }}
+      </h3>
 
-    <button type="button" :aria-label="`Delete ${todo.text}`" class="text-neutral-500 hover:text-red-500" @click="$emit('remove', todo.id)">
-      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3" />
-      </svg>
-    </button>
-  </li>
+      <p
+        v-if="task.description"
+        class="mt-1 break-words text-sm text-[#8C7868]"
+        :class="{ 'line-through opacity-50': task.completed }"
+      >
+        {{ task.description }}
+      </p>
+
+      <span
+        v-if="task.completed"
+        class="mt-2 inline-block rounded-full bg-[#E8D6C5]
+          px-3 py-1 text-xs font-semibold text-[#854021]"
+      >
+        Completed
+      </span>
+    </div>
+
+    <div class="flex shrink-0 items-center gap-2">
+      <button
+        type="button"
+        class="flex h-10 w-10 items-center justify-center
+          rounded-full text-[#A6532D] transition
+          hover:bg-[#A6532D]/10"
+        title="Delete task"
+        aria-label="Delete task"
+        @click="emit('remove', task.id)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="21"
+          height="21"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 6h18" />
+          <path d="M8 6V4h8v2" />
+          <path d="m19 6-1 14H6L5 6" />
+          <path d="M10 11v5M14 11v5" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="flex h-10 w-10 items-center justify-center
+          rounded-full transition hover:bg-[#A6532D]/10"
+        :class="task.completed ? 'text-[#8C7868]' : 'text-[#A6532D]'"
+        :title="task.completed ? 'Mark as To Do' : 'Mark as completed'"
+        :aria-label="task.completed ? 'Mark as To Do' : 'Mark as completed'"
+        @click="emit('toggle', task.id)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m5 12 4 4L19 6" />
+        </svg>
+      </button>
+    </div>
+  </article>
 </template>
