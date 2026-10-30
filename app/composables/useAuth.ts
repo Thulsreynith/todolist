@@ -5,54 +5,35 @@ type User = {
 
 export const useAuth = () => {
   const users = useState<User[]>('auth-users', () => [])
+  const isLoggedIn = useState<boolean>('auth-is-logged-in', () => false)
+  const username = useState<string>('auth-username', () => '')
 
-  const isLoggedIn = useState<boolean>(
-    'auth-is-logged-in',
-    () => false
-  )
-
-  const username = useState<string>(
-    'auth-username',
-    () => ''
-  )
-
-  const register = (name: string, password: string) => {
+  function register(name: string, password: string) {
     const cleanName = name.trim()
 
     if (!cleanName || !password) {
-      return {
-        ok: false,
-        error: 'Please enter username and password.'
-      }
+      return { ok: false, error: 'Please enter username and password.' }
     }
 
     if (users.value.some(user =>
       user.username.toLowerCase() === cleanName.toLowerCase()
     )) {
-      return {
-        ok: false,
-        error: 'Username already exists.'
-      }
+      return { ok: false, error: 'Username already exists.' }
     }
 
     if (password.length < 6) {
-      return {
-        ok: false,
-        error: 'Password must be at least 6 characters.'
-      }
+      return { ok: false, error: 'Password must be at least 6 characters.' }
     }
 
     users.value.push({
       username: cleanName,
       password
     })
-    username.value = cleanName
-    isLoggedIn.value = true
 
     return { ok: true, error: '' }
   }
 
-  const login = (name: string, password: string) => {
+  function login(name: string, password: string) {
     const cleanName = name.trim()
 
     const user = users.value.find(user =>
@@ -61,10 +42,7 @@ export const useAuth = () => {
     )
 
     if (!user) {
-      return {
-        ok: false,
-        error: 'Invalid username or password.'
-      }
+      return { ok: false, error: 'Invalid username or password.' }
     }
 
     username.value = user.username
@@ -73,7 +51,7 @@ export const useAuth = () => {
     return { ok: true, error: '' }
   }
 
-  const logout = () => {
+  function logout() {
     isLoggedIn.value = false
     username.value = ''
   }

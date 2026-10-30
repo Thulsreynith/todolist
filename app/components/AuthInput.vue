@@ -1,72 +1,60 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { Icon } from '@iconify/vue'
 
-const props = defineProps<{
-  label: string
-  placeholder: string
+const props = withDefaults(defineProps<{
   modelValue: string
+  label: string
+  placeholder?: string
   type?: string
   autocomplete?: string
-  visible?: boolean      
-  hideToggle?: boolean 
-}>()
+}>(), {
+  placeholder: '',
+  type: 'text',
+  autocomplete: 'off'
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
-  toggle: []
 }>()
 
-const localVisible = ref(false)
+const showPassword = ref(false)
 
-const isVisible = computed(() =>
-  props.visible !== undefined ? props.visible : localVisible.value
-)
-
-function toggle() {
-  if (props.visible !== undefined) {
-    emit('toggle')
-  } else {
-    localVisible.value = !localVisible.value
+const inputType = computed(() => {
+  if (props.type === 'password') {
+    return showPassword.value ? 'text' : 'password'
   }
-}
+
+  return props.type
+})
 </script>
 
 <template>
-  <div class="space-y-2">
-    <label class="block text-sm font-semibold text-[#574337]">
+  <div class="mb-5">
+    <label class="mb-2 block text-sm font-semibold text-[#574337]">
       {{ label }}
     </label>
 
     <div class="relative">
       <input
-        :type="type === 'password'
-          ? (isVisible ? 'text' : 'password')
-          : (type || 'text')"
         :value="modelValue"
+        @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+        :type="inputType"
         :placeholder="placeholder"
         :autocomplete="autocomplete"
-        required
-        class="w-full rounded-xl border border-[#E8D6C5]
-          bg-white px-4 py-3 pr-12 text-[#574337] outline-none
-          placeholder:text-[#A89A8D]
-          focus:border-[#A6532D]
-          focus:ring-2 focus:ring-[#A6532D]/15"
-        @input="emit(
-          'update:modelValue',
-          ($event.target as HTMLInputElement).value
-        )"
+        class="w-full rounded-xl border border-[#E5C9B5] bg-white px-4 py-3 pr-12 text-[#574337] outline-none transition placeholder:text-[#B7A394] focus:border-[#A6532D] focus:ring-2 focus:ring-[#A6532D]/20"
       />
 
       <button
-        v-if="type === 'password' && !hideToggle"
+        v-if="type === 'password'"
         type="button"
-        class="absolute right-4 top-1/2 -translate-y-1/2
-          text-[#A89A8D] hover:text-[#A6532D]"
-        @click="toggle"
+        @click="showPassword = !showPassword"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-[#854021] hover:text-[#A6532D]"
+        :aria-label="showPassword ? 'Hide password' : 'Show password'"
       >
         <Icon
-          :name="isVisible ? 'lucide:eye' : 'lucide:eye-off'"
-          size="21"
+          :icon="showPassword ? 'mdi:eye-off-outline' : 'mdi:eye-outline'"
+          class="h-5 w-5"
         />
       </button>
     </div>

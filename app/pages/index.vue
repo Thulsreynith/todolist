@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import TodoList from '~/components/TodoList.vue'
+const { isLoggedIn, logout } = useAuth()
 
-const { logout } = useAuth()
+if (!isLoggedIn.value) {
+  await navigateTo('/login')
+}
 
 async function handleLogout() {
   logout()
@@ -10,17 +12,16 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div
-    class="relative flex min-h-screen items-center justify-center bg-[#F8E8D8] p-4 font-sans"
-  >
-    <AppButton
-      variant="secondary"
-      class="absolute right-5 top-5"
+  <main class="relative flex min-h-screen items-center justify-center bg-[#F8E8D8] p-5">
+
+    <button
       @click="handleLogout"
+      class="absolute right-5 top-5 rounded-full bg-[#A6532D] px-5 py-2 font-semibold text-white hover:bg-[#854021]"
     >
       Logout
-    </AppButton>
+    </button>
 
     <TodoList />
-  </div>
+
+  </main>
 </template>
