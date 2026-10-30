@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps<{
   label: string
@@ -7,13 +7,28 @@ const props = defineProps<{
   modelValue: string
   type?: string
   autocomplete?: string
+  visible?: boolean      
+  hideToggle?: boolean 
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  toggle: []
 }>()
 
-const showPassword = ref(false)
+const localVisible = ref(false)
+
+const isVisible = computed(() =>
+  props.visible !== undefined ? props.visible : localVisible.value
+)
+
+function toggle() {
+  if (props.visible !== undefined) {
+    emit('toggle')
+  } else {
+    localVisible.value = !localVisible.value
+  }
+}
 </script>
 
 <template>
@@ -25,7 +40,7 @@ const showPassword = ref(false)
     <div class="relative">
       <input
         :type="type === 'password'
-          ? (showPassword ? 'text' : 'password')
+          ? (isVisible ? 'text' : 'password')
           : (type || 'text')"
         :value="modelValue"
         :placeholder="placeholder"
@@ -43,45 +58,16 @@ const showPassword = ref(false)
       />
 
       <button
-        v-if="type === 'password'"
+        v-if="type === 'password' && !hideToggle"
         type="button"
-        @click="showPassword = !showPassword"
         class="absolute right-4 top-1/2 -translate-y-1/2
           text-[#A89A8D] hover:text-[#A6532D]"
+        @click="toggle"
       >
-        <svg
-          v-if="showPassword"
-          xmlns="http://www.w3.org/2000/svg"
-          width="21"
-          height="21"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
-
-        <svg
-          v-else
-          xmlns="http://www.w3.org/2000/svg"
-          width="21"
-          height="21"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 3l18 18" />
-          <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
-          <path d="M9.9 5.2A11 11 0 0 1 12 5c6.4 0 10 7 10 7a13 13 0 0 1-3 3.8" />
-          <path d="M6.6 6.6C3.6 8.4 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8" />
-        </svg>
+        <Icon
+          :name="isVisible ? 'lucide:eye' : 'lucide:eye-off'"
+          size="21"
+        />
       </button>
     </div>
   </div>
