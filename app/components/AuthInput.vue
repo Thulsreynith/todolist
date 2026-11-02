@@ -38,19 +38,20 @@ const inputType = computed(() => {
     <div class="relative">
       <input
         :value="modelValue"
-        @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         :type="inputType"
         :placeholder="placeholder"
         :autocomplete="autocomplete"
-        class="w-full rounded-xl border border-[#E5C9B5] bg-white px-4 py-3 pr-12 text-[#574337] outline-none transition placeholder:text-[#B7A394] focus:border-[#A6532D] focus:ring-2 focus:ring-[#A6532D]/20"
+        class="w-full rounded-xl border border-[#E5C9B5] bg-white px-4 py-3 text-[#574337] outline-none transition placeholder:text-[#B7A394] focus:border-[#A6532D] focus:ring-2 focus:ring-[#A6532D]/20"
+        :class="type === 'password' ? 'pr-12' : ''"
+        @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
 
       <button
         v-if="type === 'password'"
         type="button"
-        @click="showPassword = !showPassword"
         class="absolute right-4 top-1/2 -translate-y-1/2 text-[#854021] hover:text-[#A6532D]"
         :aria-label="showPassword ? 'Hide password' : 'Show password'"
+        @click="showPassword = !showPassword"
       >
         <Icon
           :icon="showPassword ? 'mdi:eye-off-outline' : 'mdi:eye-outline'"
@@ -60,3 +61,10 @@ const inputType = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+</style>
