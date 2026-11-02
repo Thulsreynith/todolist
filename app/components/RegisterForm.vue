@@ -1,10 +1,15 @@
+
 <script setup lang="ts">
 import { ref } from 'vue'
+import { registerSchema } from '~/schemas/register.schema'
 
 const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const localError = ref('')
+
+const usernameError = ref('')
+const passwordError = ref('')
+const confirmPasswordError = ref('')
 
 defineProps<{
   error?: string
@@ -16,21 +21,29 @@ const emit = defineEmits<{
 }>()
 
 function handleSubmit() {
-  localError.value = ''
+  usernameError.value = ''
+  passwordError.value = ''
+  confirmPasswordError.value = ''
 
-  if (password.value.length < 6) {
-    localError.value = 'Password must be at least 6 characters.'
-    return
-  }
+  const validation = registerSchema.safeParse({
+    username: username.value,
+    password: password.value,
+    confirmPassword: confirmPassword.value,
+  })
 
-  if (password.value !== confirmPassword.value) {
-    localError.value = 'Passwords do not match.'
+  if (!validation.success) {
+    const errors = validation.error.flatten().fieldErrors
+
+    usernameError.value = errors.username?.[0] || ''
+    passwordError.value = errors.password?.[0] || ''
+    confirmPasswordError.value = errors.confirmPassword?.[0] || ''
+
     return
   }
 
   emit('submit', {
-    username: username.value.trim(),
-    password: password.value,
+    username: validation.data.username,
+    password: validation.data.password,
   })
 }
 </script>
@@ -46,34 +59,46 @@ function handleSubmit() {
       </p>
     </div>
 
-    <AuthInput
-      v-model="username"
-      label="Username"
-      placeholder="Choose a username"
-      autocomplete="username"
-    />
+    <div>
+      <AuthInput
+        v-model="username"
+        label="Username"
+        placeholder="Choose a username"
+        autocomplete="username"
+      />
+      <p v-if="usernameError" class="mt-1 text-sm text-red-600">
+        {{ usernameError }}
+      </p>
+    </div>
 
-    <AuthInput
-      v-model="password"
-      label="Password"
-      placeholder="Create a password"
-      type="password"
-      autocomplete="new-password"
-    />
+    <div>
+      <AuthInput
+        v-model="password"
+        label="Password"
+        placeholder="Create a password"
+        type="password"
+        autocomplete="new-password"
+      />
+      <p v-if="passwordError" class="mt-1 text-sm text-red-600">
+        {{ passwordError }}
+      </p>
+    </div>
 
-    <AuthInput
-      v-model="confirmPassword"
-      label="Confirm Password"
-      placeholder="Enter password again"
-      type="password"
-      autocomplete="new-password"
-    />
+    <div>
+      <AuthInput
+        v-model="confirmPassword"
+        label="Confirm Password"
+        placeholder="Enter password again"
+        type="password"
+        autocomplete="new-password"
+      />
+      <p v-if="confirmPasswordError" class="mt-1 text-sm text-red-600">
+        {{ confirmPasswordError }}
+      </p>
+    </div>
 
-    <p
-      v-if="localError || error"
-      class="text-sm text-red-600"
-    >
-      {{ localError || error }}
+    <p v-if="error" class="text-sm text-red-600">
+      {{ error }}
     </p>
 
     <AppButton type="submit" block>

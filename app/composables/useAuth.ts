@@ -35,7 +35,6 @@ export const useAuth = () => {
 
   function login(name: string, password: string) {
     const cleanName = name.trim()
-
     const user = users.value.find(user =>
       user.username.toLowerCase() === cleanName.toLowerCase() &&
       user.password === password

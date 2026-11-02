@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { loginSchema } from '~/schemas/login.schema'
 
 const username = ref('')
 const password = ref('')
+
+const usernameError = ref('')
+const passwordError = ref('')
 
 defineProps<{
   error?: string
@@ -14,10 +18,24 @@ const emit = defineEmits<{
 }>()
 
 function handleSubmit() {
-  emit('submit', {
-    username: username.value.trim(),
+  usernameError.value = ''
+  passwordError.value = ''
+
+  const validation = loginSchema.safeParse({
+    username: username.value,
     password: password.value,
   })
+
+  if (!validation.success) {
+    const errors = validation.error.flatten().fieldErrors
+
+    usernameError.value = errors.username?.[0] || ''
+    passwordError.value = errors.password?.[0] || ''
+
+    return
+  }
+
+  emit('submit', validation.data)
 }
 </script>
 
@@ -32,20 +50,30 @@ function handleSubmit() {
       </p>
     </div>
 
-    <AuthInput
-      v-model="username"
-      label="Username"
-      placeholder="Enter your username"
-      autocomplete="username"
-    />
+    <div>
+      <AuthInput
+        v-model="username"
+        label="Username"
+        placeholder="Enter your username"
+        autocomplete="username"
+      />
+      <p v-if="usernameError" class="mt-1 text-sm text-red-600">
+        {{ usernameError }}
+      </p>
+    </div>
 
-    <AuthInput
-      v-model="password"
-      label="Password"
-      placeholder="Enter your password"
-      type="password"
-      autocomplete="current-password"
-    />
+    <div>
+      <AuthInput
+        v-model="password"
+        label="Password"
+        placeholder="Enter your password"
+        type="password"
+        autocomplete="current-password"
+      />
+      <p v-if="passwordError" class="mt-1 text-sm text-red-600">
+        {{ passwordError }}
+      </p>
+    </div>
 
     <p v-if="error" class="text-sm text-red-600">
       {{ error }}
