@@ -2,10 +2,9 @@
 import { ref } from 'vue'
 
 const { login, register, isLoggedIn } = useAuth()
+const notify = useNotify()
 
 const isRegister = ref(true)
-const errorMessage = ref('')
-const successMessage = ref('')
 
 if (isLoggedIn.value) {
   await navigateTo('/')
@@ -13,37 +12,36 @@ if (isLoggedIn.value) {
 
 function switchForm() {
   isRegister.value = !isRegister.value
-  errorMessage.value = ''
-  successMessage.value = ''
 }
-
-async function handleLogin(data: { username: string; password: string }) {
-  errorMessage.value = ''
-  successMessage.value = ''
-
+function handleLogin(data: {
+  username: string
+  password: string
+}) {
   const result = login(data.username, data.password)
 
   if (!result.ok) {
-    errorMessage.value = result.error
+    notify.error(result.error)
     return
   }
 
-  await navigateTo('/')
+  notify.success('Login successful! Welcome back.')
+
+  navigateTo('/')
 }
 
-function handleRegister(data: { username: string; password: string }) {
-  errorMessage.value = ''
-  successMessage.value = ''
-
+function handleRegister(data: {
+  username: string
+  password: string
+}) {
   const result = register(data.username, data.password)
 
   if (!result.ok) {
-    errorMessage.value = result.error
+    notify.error(result.error)
     return
   }
 
   isRegister.value = false
-  successMessage.value = 'Account created. Please login.'
+  notify.success('Account created. Please login.')
 }
 </script>
 
@@ -53,24 +51,15 @@ function handleRegister(data: { username: string; password: string }) {
       class="w-full max-w-md rounded-3xl border border-white/80
         bg-[#FFF9F3] p-7 shadow-xl sm:p-9"
     >
-      <p
-        v-if="successMessage && !isRegister"
-        class="mb-4 text-center text-sm font-medium text-green-700"
-      >
-        {{ successMessage }}
-      </p>
-
-      <LoginForm
-        v-if="!isRegister"
-        :error="errorMessage"
-        @submit="handleLogin"
+      <RegisterForm
+        v-if="isRegister"
+        @submit="handleRegister"
         @switch="switchForm"
       />
 
-      <RegisterForm
+      <LoginForm
         v-else
-        :error="errorMessage"
-        @submit="handleRegister"
+        @submit="handleLogin"
         @switch="switchForm"
       />
     </section>

@@ -1,3 +1,6 @@
 <template>
-  <NuxtPage />
+  <div>
+    <AppToast />
+    <NuxtPage />
+  </div>
 </template>

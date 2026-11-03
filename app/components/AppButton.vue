@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
   type?: 'button' | 'submit' | 'reset'
-  variant?: 'primary' | 'secondary' | 'danger'
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
   disabled?: boolean
   block?: boolean
 }>(), {
@@ -17,11 +17,12 @@ withDefaults(defineProps<{
     :type="type"
     :disabled="disabled"
     class="inline-flex items-center justify-center rounded-full
-      px-6 py-3 font-semibold transition duration-200
+      font-semibold transition duration-200
       focus:outline-none focus:ring-2 focus:ring-[#A6532D]/30
       disabled:cursor-not-allowed disabled:opacity-50"
     :class="[
       block ? 'w-full' : '',
+      variant === 'ghost' ? 'px-2 py-1' : 'px-6 py-3',
       variant === 'primary'
         ? 'bg-[#A6532D] text-white shadow-md hover:bg-[#854021]'
         : '',
@@ -30,6 +31,9 @@ withDefaults(defineProps<{
         : '',
       variant === 'danger'
         ? 'bg-[#854021] text-white hover:bg-[#6D321A]'
+        : '',
+      variant === 'ghost'
+        ? 'bg-transparent text-white opacity-70 hover:opacity-100 focus:ring-white/40'
         : '',
     ]"
   >

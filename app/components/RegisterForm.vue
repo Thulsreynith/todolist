@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import { registerSchema } from '~/schemas/register.schema'
@@ -45,6 +44,7 @@ function handleSubmit() {
     username: validation.data.username,
     password: validation.data.password,
   })
+  
 }
 </script>
 
